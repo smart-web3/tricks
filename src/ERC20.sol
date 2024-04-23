@@ -16,6 +16,7 @@ contract ERC20 {
         _name = name_;
         _symbol = symbol_;
         _decimals = decimals_;
+        
         _totalSupply = totalSupply_ * (10 ** uint256(decimals_));
         _balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
@@ -40,7 +41,8 @@ contract ERC20 {
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
-
+    
+    // FALSE
     function transfer(address recipient, uint256 amount) public returns (bool) {
         _transfer(msg.sender, recipient, amount);
         return true;
@@ -55,17 +57,20 @@ contract ERC20 {
         return true;
     }
 
+    //Mal implementer
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
         return true;
     }
 
+    // pas Utile
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
         _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
         return true;
     }
 
+    // pas Utile
     function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
         _approve(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
         return true;
@@ -80,7 +85,7 @@ contract ERC20 {
         _balances[recipient] += amount;
         emit Transfer(sender, recipient, amount);
     }
-
+    
     function _approve(address owner, address spender, uint256 amount) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
