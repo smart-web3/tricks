@@ -51,7 +51,7 @@ contract PoolStack{
         require(_owner != address(0));
         require(stackData[owner].balance > 0);
         return stackData[_owner].balance;
-    
+    }
     
     //function to check reward's address user in pool
     function getRewardAddress(address _owner) external view returns(uint256){
