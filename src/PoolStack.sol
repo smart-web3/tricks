@@ -54,6 +54,7 @@ contract PoolStack{
         stackData[_from].durationStack = duration - block.timestamp;
         // compute users's rewards
         stackData[_from].reward = _computeReward(_from);
+        totalStacked += _amount;
 
         emit Deposit(_from, address(this), _amount);
         return true;
@@ -63,6 +64,7 @@ contract PoolStack{
         require(_from != address(0));
         require(_amount > 0);
         payable(address(this)).transfer(_amount);
+        totalStacked += _amount;
 
         emit Deposit(_from, address(this), _amount);
         return true;
@@ -80,8 +82,9 @@ contract PoolStack{
         stackData[_to].balance -= amount;
         stackData[_to].reward = 0;
         stackData[_to].durationStack = 0;
+        totalStacked -= amount;
         _to.transfer(amount);
-
+        
         emit Without(address(this), _to, amount);
         return true;
     }
