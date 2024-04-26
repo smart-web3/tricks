@@ -78,9 +78,19 @@ contract PoolStack{
         require(stackData[_to].balance > 0);
         uint256 amount = stackData[_to].balance;
         stackData[_to].balance -= amount;
+        stackData[_to].reward = 0;
+        stackData[_to].durationStack = 0;
         _to.transfer(amount);
 
         emit Without(address(this), _to, amount);
+        return true;
+    }
+
+    function claimRewardETH(address payable _owner) external returns(bool){
+        uint256 amount = _claimRewardETH(_owner);
+        _owner.transfer(amount);
+
+        emit Without(address(this), _owner, amount);
         return true;
     }
 
@@ -94,5 +104,14 @@ contract PoolStack{
     //subFunction to deposit ETH
     function _computeReward(address _owner) internal view returns(uint256){
         return (stackData[_owner].balance * rate * stackData[_owner].durationStack)/100;
+    }
+
+    // sub function to claim reward
+    function _claimRewardETH(address payable _owner) internal returns(uint256){
+        require(_owner != address(0));
+        require(stackData[_owner].reward > 0);
+        uint256 amount = stackData[_owner].reward;
+        stackData[_owner].reward -= amount;
+        return amount;
     }
 }
