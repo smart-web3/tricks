@@ -6,7 +6,7 @@ import {ERC20} from "./ERC20.sol";
 contract PoolStack{
     // pool data
     address internal owner;
-    string[] internal tokens; 
+    string[2] internal tokens; 
     string internal time;
     uint8 internal rate;
     uint256 internal totalStacked;
@@ -44,6 +44,20 @@ contract PoolStack{
 
     function getTotalStaking() external view returns(uint256){
         return totalStacked;
+    }
+
+    //function to check balance's address user in pool
+    function getBalanceAddress(address _owner) external view returns(uint256){
+        require(_owner != address(0));
+        require(stackData[owner].balance > 0);
+        return stackData[_owner].balance;
+    }
+    
+    //function to check reward's address user in pool
+    function getRewardAddress(address _owner) external view returns(uint256){
+        require(_owner != address(0));
+        require(stackData[owner].balance > 0);
+        return stackData[_owner].reward;
     }
 
     function goStackERC20(address payable _from, uint256 _amount) external returns(bool){
