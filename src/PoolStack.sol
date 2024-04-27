@@ -49,15 +49,22 @@ contract PoolStack{
     //function to check balance's address user in pool
     function getBalanceAddress(address _owner) external view returns(uint256){
         require(_owner != address(0));
-        require(stackData[owner].balance > 0);
+        require(stackData[_owner].balance > 0);
         return stackData[_owner].balance;
     }
     
     //function to check reward's address user in pool
     function getRewardAddress(address _owner) external view returns(uint256){
         require(_owner != address(0));
-        require(stackData[owner].balance > 0);
+        require(stackData[_owner].balance > 0);
         return stackData[_owner].reward;
+    }
+
+    function getDurationOver(address _owner) external view returns(bool){
+        require(_owner != address(0));
+        require(stackData[_owner].balance > 0);
+        require(stackData[_owner].durationStack > 1 minutes, "not finish");
+        return true;
     }
 
     function goStackERC20(address payable _from, uint256 _amount) external returns(bool){
@@ -78,7 +85,6 @@ contract PoolStack{
         require(_from != address(0));
         require(_amount > 0);
         payable(address(this)).transfer(_amount);
-        totalStacked += _amount;
 
         emit Deposit(_from, address(this), _amount);
         return true;
@@ -97,23 +103,27 @@ contract PoolStack{
         stackData[_to].reward = 0;
         stackData[_to].durationStack = 0;
         totalStacked -= amount;
-        _to.transfer(amount);
-        
+        (bool success, ) = _to.call{value: amount}("");
+        require(success == true, "Transfer Error");
+
         emit Without(address(this), _to, amount);
         return true;
     }
 
-    function claimRewardETH(address payable _owner) external returns(bool){
-        uint256 amount = _claimRewardETH(_owner);
-        _owner.transfer(amount);
+    function claimRewardETH(address payable _to) external returns(bool){
+        uint256 amount = _claimRewardETH(_to);
+        (bool success, ) = _to.call{value: amount}("");
+        require(success == true, "Transfer Error");
 
-        emit Without(address(this), _owner, amount);
+        emit Without(address(this), _to, amount);
         return true;
     }
 
     receive() external payable{
         stackData[msg.sender].balance += msg.value;
+        totalStacked += msg.value;
         stackData[msg.sender].durationStack = duration - block.timestamp;
+
         // compute users's rewards
         stackData[msg.sender].reward = _computeReward(msg.sender);
     }
