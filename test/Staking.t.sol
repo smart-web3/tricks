@@ -15,6 +15,8 @@ contract TestPoolStack is Test{
     //event for without
     event Without(address indexed _from, address indexed _to, uint256 _amount);
  
+    address owner = address("0x7109709ECfa91a80626fF3989D68f67F5b1DD12D");
+
     function setUp() external {
         poolStack = new PoolStack(
             ["ETH", "SOL"],
@@ -34,12 +36,13 @@ contract TestPoolStack is Test{
 
     function test_withoutETH() external noGasMetering {
         //send ETH
+        vm.
         payable(address(poolStack)).transfer(1e8);
-
         //without ETH
         //vm.expectEmit(true, true, false, true);
         //emit Without(address(poolStack), address(this), 1e8);
-        bool result = poolStack.withoutETH(payable(address(this)));
+        bool result = poolStack.withoutETH(payable(address(1)));
+        vm.resumeGasMetering();
         assertEq(result, true);
     }
 
@@ -47,8 +50,9 @@ contract TestPoolStack is Test{
         //send ETH
         payable(address(poolStack)).transfer(1e8);
 
-        //get time
-        bool check = poolStack.claimRewardETH(payable(address(1)));
+        //claim reward
+        vm.resumeGasMetering();
+        bool check = poolStack.claimRewardETH(payable(address(this)));
         assertEq(check, true);
     }
 }

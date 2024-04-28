@@ -103,17 +103,14 @@ contract PoolStack{
         stackData[_to].reward = 0;
         stackData[_to].durationStack = 0;
         totalStacked -= amount;
-        (bool success, ) = _to.call{value: amount}("");
-        require(success == true, "Transfer Error");
+        _to.transfer(amount);
 
-        emit Without(address(this), _to, amount);
         return true;
     }
 
     function claimRewardETH(address payable _to) external returns(bool){
         uint256 amount = _claimRewardETH(_to);
-        (bool success, ) = _to.call{value: amount}("");
-        require(success == true, "Transfer Error");
+        _to.transfer(amount);
 
         emit Without(address(this), _to, amount);
         return true;
