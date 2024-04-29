@@ -158,3 +158,4 @@ contract ERC20 is Ownable, ReentrancyGuard {
         _calledFunctions[caller][funcSig] = true;
     }
 }
+

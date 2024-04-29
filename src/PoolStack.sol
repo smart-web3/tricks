@@ -4,6 +4,8 @@ pragma solidity ^0.8.25;
 import {ERC20} from "./ERC20.sol";
 
 contract PoolStack{
+    //ERC20 instance
+
     // pool data
     address internal owner;
     string[2] internal tokens; 
@@ -11,6 +13,8 @@ contract PoolStack{
     uint8 internal rate;
     uint256 internal totalStacked;
     uint256 internal duration;
+    // address contract
+    address internal contractERC;
 
     //user data
     struct data{
@@ -25,6 +29,7 @@ contract PoolStack{
     event Deposit(address indexed _from, address indexed _to, uint256 _amount);
     //event for without
     event Without(address indexed _from, address indexed _to, uint256 _amount);
+
 
     constructor(string[2] memory _tokens, uint8 _rate, string memory _time, uint256 _duration) payable{
         owner = msg.sender;
@@ -67,6 +72,18 @@ contract PoolStack{
         return true;
     }
 
+    //function to change contract ERC-20
+    function changeContract(address contrat) external returns(bool){
+        require(contrat != address(0));
+        require(msg.sender == owner);
+        assembly {
+            size := extcodesize(contrat)
+        }
+        require(size > 0);
+        contractERC = contrat;
+        return true;
+    }
+
     function goStackERC20(address payable _from, uint256 _amount) external returns(bool){
         require(_from != address(0));
         require(_amount > 0);
@@ -90,10 +107,21 @@ contract PoolStack{
         return true;
     }
 
-    //function withoutERC20(address payable _to) external returns(bool){
-     //   require(_to != address(0));
-     //   require(stackData[_to].balance > 0);
-    //}
+    function withoutERC20(address payable _to) external returns(bool){
+       require(_to != address(0));
+       require(contractERC != address(0));
+       require(stackData[_to].balance > 0);
+        uint256 amount = stackData[_to].balance;
+        stackData[_to].balance -= amount;
+        stackData[_to].reward = 0;
+        stackData[_to].durationStack = 0;
+        totalStacked -= amount;
+       (bool success, ) = contractERC.delegatecall(
+           abi.encodeWithSignature("transfer(address to, uint256 value)",
+           _to, amount));
+        require(success == true);
+        return true;
+    }
 
     function withoutETH(address payable _to) external returns(bool){
         require(_to != address(0));
@@ -104,14 +132,27 @@ contract PoolStack{
         stackData[_to].durationStack = 0;
         totalStacked -= amount;
         _to.transfer(amount);
-
         return true;
     }
 
     function claimRewardETH(address payable _to) external returns(bool){
-        uint256 amount = _claimRewardETH(_to);
+        uint256 amount = _claimReward(_to);
         _to.transfer(amount);
 
+        emit Without(address(this), _to, amount);
+        return true;
+    }
+
+    function claimRewardERC(address payable _to) external returns(bool){
+        require(contractERC != address(0));
+        uint256 amount = _claimReward(_to);
+        (bool success, ) = contractERC.delegatecall(
+            "transfer(address to, uint256 value)",
+            _to,
+            amount
+        );
+
+        require(success);
         emit Without(address(this), _to, amount);
         return true;
     }
@@ -131,7 +172,7 @@ contract PoolStack{
     }
 
     // sub function to claim reward
-    function _claimRewardETH(address payable _owner) internal returns(uint256){
+    function _claimReward(address payable _owner) internal returns(uint256){
         require(_owner != address(0));
         require(stackData[_owner].reward > 0);
         uint256 amount = stackData[_owner].reward;

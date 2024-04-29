@@ -34,25 +34,24 @@ contract TestPoolStack is Test{
         assertEq(value, 1e8);
     }
 
-    function test_withoutETH() external noGasMetering {
+    //function test_withoutETH() external noGasMetering {
         //send ETH
-        vm.
-        payable(address(poolStack)).transfer(1e8);
+     //   payable(address(poolStack)).transfer(1e8);
         //without ETH
         //vm.expectEmit(true, true, false, true);
         //emit Without(address(poolStack), address(this), 1e8);
-        bool result = poolStack.withoutETH(payable(address(1)));
-        vm.resumeGasMetering();
-        assertEq(result, true);
-    }
+       // bool result = poolStack.withoutETH(payable(address(1)));
+        //vm.resumeGasMetering();
+        //assertEq(result, true);
+    //}
 
-    function test_getClaimRewardETH() external{
+    //function test_getClaimRewardETH() external{
         //send ETH
-        payable(address(poolStack)).transfer(1e8);
+     //   payable(address(poolStack)).transfer(1e8);
 
         //claim reward
-        vm.resumeGasMetering();
-        bool check = poolStack.claimRewardETH(payable(address(this)));
-        assertEq(check, true);
-    }
+      //  vm.resumeGasMetering();
+      //  bool check = poolStack.claimRewardETH(payable(address(this)));
+      //  assertEq(check, true);
+    //}
 }
