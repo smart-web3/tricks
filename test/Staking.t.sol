@@ -15,7 +15,7 @@ contract TestPoolStack is Test{
     //event for without
     event Without(address indexed _from, address indexed _to, uint256 _amount);
  
-    address owner = address("0x7109709ECfa91a80626fF3989D68f67F5b1DD12D");
+    //address owner = address("0x7109709ECfa91a80626fF3989D68f67F5b1DD12D");
 
     function setUp() external {
         poolStack = new PoolStack(
@@ -34,24 +34,25 @@ contract TestPoolStack is Test{
         assertEq(value, 1e8);
     }
 
-    //function test_withoutETH() external noGasMetering {
+    function test_withoutETH() external noGasMetering {
         //send ETH
-     //   payable(address(poolStack)).transfer(1e8);
+        payable(address(poolStack)).transfer(1e8);
         //without ETH
-        //vm.expectEmit(true, true, false, true);
-        //emit Without(address(poolStack), address(this), 1e8);
-       // bool result = poolStack.withoutETH(payable(address(1)));
-        //vm.resumeGasMetering();
-        //assertEq(result, true);
-    //}
+        vm.expectEmit(true, true, false, true);
+        emit Without(address(poolStack), address(this), 1e8);
+        bool result = poolStack.withoutETH(payable(address(1)));
+        vm.resumeGasMetering();
+        assertEq(result, true);
+    }
 
-    //function test_getClaimRewardETH() external{
+    function test_ClaimRewardETH() external{
         //send ETH
-     //   payable(address(poolStack)).transfer(1e8);
+        payable(address(poolStack)).transfer(1e8);
 
         //claim reward
-      //  vm.resumeGasMetering();
-      //  bool check = poolStack.claimRewardETH(payable(address(this)));
-      //  assertEq(check, true);
-    //}
+        vm.resumeGasMetering();
+        bool check = poolStack.claimRewardETH(payable(address(this)));
+        assertEq(check, true);
+    }
+
 }

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
 contract ERC20 is Ownable, ReentrancyGuard {
-    string private _name;6
+    string private _name;
     string private _symbol;
     uint8 private _decimals;
     uint256 private _totalSupply;

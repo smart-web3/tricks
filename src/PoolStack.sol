@@ -117,8 +117,8 @@ contract PoolStack{
         stackData[_to].durationStack = 0;
         totalStacked -= amount;
        (bool success, ) = contractERC.delegatecall(
-           abi.encodeWithSignature("transfer(address to, uint256 value)",
-           _to, amount));
+           abi.encodeWithSignature("transferFrom(address from, address to, uint256 value)",
+           msg.sender, _to, amount));
         require(success == true);
         return true;
     }
@@ -147,7 +147,8 @@ contract PoolStack{
         require(contractERC != address(0));
         uint256 amount = _claimReward(_to);
         (bool success, ) = contractERC.delegatecall(
-            "transfer(address to, uint256 value)",
+            "transferFrom(address from, address to, uint256 value)",
+            msg.sender,
             _to,
             amount
         );
